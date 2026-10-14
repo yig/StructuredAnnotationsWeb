@@ -37,10 +37,10 @@ export interface SameTilt {
     masters: number[];
 }
 
-// Cylinder cross sections with the same scale (radius).
+// Cylinder cross sections (at parameter t) or ellipsoids' circular cross sections with the same scale (radius).
 export interface SameScale {
     type: 'sameScale';
-    items: { shape: string, t: number }[];
+    items: { shape: string, t?: number }[];
     masters: number[];
 }
 

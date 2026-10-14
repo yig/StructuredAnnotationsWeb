@@ -30,8 +30,9 @@ class Solver {
     readonly warnings: string[] = [];
     readonly mirrored: { source: string, mesh: TriMesh }[] = [];
 
-    constructor( scene: Scene ) {
-        for( const s of scene.shapes ) this.shapes.set( s.id, s.clone() );
+    // With 'clone' false, the solver operates on the scene's own shapes; use only for queries.
+    constructor( scene: Scene, clone = true ) {
+        for( const s of scene.shapes ) this.shapes.set( s.id, clone ? s.clone() : s );
         // Copy annotations, because connection curves are translated along with shapes.
         // (Don't remove invalid ones: same-length items refer to connections by index.)
         this.annotations = structuredClone( scene.annotations );
@@ -91,19 +92,20 @@ class Solver {
 
     // Same-scale: set every cross section's radius to the average.
     private applySameScale( a: SameScale ): void {
-        const items = a.items.filter( i => {
-            const s = this.shape( i.shape );
-            return s instanceof Cylinder && s.radii.has( i.t );
-        } );
-        const radius = ( i: SameScale['items'][number] ) => ( this.shape( i.shape ) as Cylinder ).radii.get( i.t )!;
+        const get = ( item: SameScale['items'][number] ): number | undefined => {
+            const s = this.shape( item.shape );
+            if( s instanceof Ellipsoid ) return s.getRadius();
+            return item.t === undefined ? undefined : s.radii.get( item.t );
+        };
+        const items = a.items.filter( i => get( i ) !== undefined );
         const toAverage = a.masters.length > 0 ? a.masters.map( i => a.items[i] ).filter( i => items.includes( i ) ) : items;
         let avg = 0;
-        for( const i of toAverage ) avg += radius( i );
+        for( const i of toAverage ) avg += get( i )!;
         if( toAverage.length > 0 ) avg /= toAverage.length;
         for( const i of items ) {
-            const s = this.shape( i.shape ) as Cylinder;
-            s.radii.set( i.t, avg );
-            s.changed( 'radii' );
+            const s = this.shape( i.shape );
+            if( s instanceof Ellipsoid ) s.setRadius( avg );
+            else { s.radii.set( i.t!, avg ); s.changed( 'radii' ); }
         }
     }
 
@@ -288,7 +290,7 @@ class Solver {
     private mirrorPlane( shapeId: string, pt: Vec3 ): Plane { return this.shape( shapeId ).mirrorPlane( pt ); }
 
     // MirrorManipSweepShape.origin()
-    private originRelativeTo( shapeId: string, parentId: string ): Vec3 {
+    originRelativeTo( shapeId: string, parentId: string ): Vec3 {
         return this.origin( shapeId, this.connectionBetween( shapeId, parentId ) ?? null );
     }
 
@@ -349,4 +351,10 @@ function lexLess( a: Vec3, b: Vec3 ): boolean {
 
 export function solveScene( scene: Scene ): SolvedScene {
     return new Solver( scene ).run();
+}
+
+// The origin of shape 'shapeId' relative to its parent shape 'parentId' (where it is scaled and
+// mirrored about), computed on the scene's unsolved shapes.
+export function originRelativeTo( scene: Scene, shapeId: string, parentId: string ): Vec3 {
+    return new Solver( scene, false ).originRelativeTo( shapeId, parentId );
 }
