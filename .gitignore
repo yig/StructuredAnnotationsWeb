@@ -1,0 +1,4 @@
+node_modules/
+dist/
+# Reference geometry recorded from the desktop Python app (regenerate with tools/golden.py).
+test/golden/
