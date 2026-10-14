@@ -47,6 +47,10 @@ def find_image( image_path ):
     '''
     if image_path is None: return None
 
+    ## Python 2 pickles store paths as UTF-8 bytes, which are loaded as latin1-decoded strings.
+    try: image_path = image_path.encode( 'latin1' ).decode( 'utf8' )
+    except ( UnicodeEncodeError, UnicodeDecodeError ): pass
+
     candidates = [ image_path, os.path.join( kRepoRoot, image_path ) ]
 
     norm = image_path.replace( '\\', '/' )
@@ -57,8 +61,12 @@ def find_image( image_path ):
     candidates.append( os.path.join( kRepoRoot, 'scenes', 'artwork', os.path.basename( norm ) ) )
     candidates.append( os.path.join( kRepoRoot, 'scenes', 'artwork', 'blair', os.path.basename( norm ) ) )
 
+    ## macOS file names may be stored in either Unicode normalization form.
+    import unicodedata
     for candidate in candidates:
-        if os.path.isfile( candidate ): return candidate
+        for form in ( 'NFC', 'NFD' ):
+            normalized = unicodedata.normalize( form, candidate )
+            if os.path.isfile( normalized ): return normalized
     return None
 
 def convert_annotations( anns ):
@@ -113,6 +121,19 @@ def convert_annotations( anns ):
                 'curve': floats( ann.connection_curve ),
                 } )
 
+    def parenting_connection_index( manip ):
+        con = manip.parenting_connection
+        if con is None: return None
+        if id( con ) in connection2index: return connection2index[ id( con ) ]
+        ## The connection was deleted but is still referenced.  The desktop app keeps using the
+        ## deleted connection's curve; use the live connection between the same shapes instead, if any.
+        for other in anns:
+            if isinstance( other, Connection ) and set( map( id, other.regions ) ) == set( map( id, con.regions ) ):
+                print( 'NOTE: same-length annotation referenced a deleted connection; using the live one between the same shapes.' )
+                return connection2index[ id( other ) ]
+        print( 'NOTE: same-length annotation referenced a deleted connection; dropping the reference.' )
+        return None
+    
     def masters( ann ):
         return [ ann.manips.index( m ) for m in ann.master_manips ]
 
@@ -139,7 +160,7 @@ def convert_annotations( anns ):
                 'items': [
                     {
                         'shape': shape2id[ id( m.shape ) ],
-                        'connection': None if m.parenting_connection is None else connection2index[ id( m.parenting_connection ) ],
+                        'connection': parenting_connection_index( m ),
                     }
                     for m in ann.manips
                     ],
@@ -170,14 +191,20 @@ def convert_file( path, out_dir ):
 
     name = os.path.splitext( os.path.basename( path ) )[0]
 
+    ## Annotations.Load() leaves image_path as None when it can't open the image,
+    ## so read the stored path from the file's ( format, annotations, image path, oblique ) tuple.
+    import pickle
+    with open( path, 'rb' ) as f:
+        stored_image_path = pickle.load( f, encoding = 'latin1' )[2]
+    
     image = None
-    image_src = find_image( A.image_path )
+    image_src = find_image( stored_image_path )
     if image_src is not None:
         os.makedirs( os.path.join( out_dir, 'images' ), exist_ok = True )
         image = 'images/' + os.path.basename( image_src )
         shutil.copyfile( image_src, os.path.join( out_dir, image ) )
-    elif A.image_path is not None:
-        print( 'WARNING: guide image not found:', A.image_path )
+    elif stored_image_path is not None:
+        print( 'WARNING: guide image not found:', stored_image_path )
 
     scene = {
         'format': kFormatName,
