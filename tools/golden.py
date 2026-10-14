@@ -18,8 +18,8 @@ import json
 import warnings
 from copy import deepcopy
 
-kRepoRoot = os.path.abspath( os.path.join( os.path.dirname( __file__ ), '..', '..' ) )
-sys.path.insert( 0, kRepoRoot )
+sys.path.insert( 0, os.path.dirname( os.path.abspath( __file__ ) ) )
+from common import kRepoRoot, load_annotations
 ## Modules such as ellipsoid.py load data files relative to the current directory.
 kInvocationDir = os.getcwd()
 os.chdir( kRepoRoot )
@@ -62,12 +62,9 @@ def is_shape( ann ):
     return isinstance( ann, SweepShape ) or ( isinstance( ann, AnnotationData ) and ann.ellipsoid is not None )
 
 def record( path, out_dir ):
-    from wx_annotate_shell import Annotations
-    import wx_annotate_collection
     import annotations_symbols
 
-    A = Annotations()
-    A.Load( path )
+    A = load_annotations( path )
 
     raw = {}
     for ann in deepcopy( A.anns ):

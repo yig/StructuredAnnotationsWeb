@@ -17,8 +17,8 @@ import json
 import shutil
 import warnings
 
-kRepoRoot = os.path.abspath( os.path.join( os.path.dirname( __file__ ), '..', '..' ) )
-sys.path.insert( 0, kRepoRoot )
+sys.path.insert( 0, os.path.dirname( os.path.abspath( __file__ ) ) )
+from common import kRepoRoot, load_annotations
 warnings.filterwarnings( 'ignore' )
 
 kFormatName = 'structured-annotations-scene'
@@ -182,10 +182,7 @@ def convert_annotations( anns ):
     return shapes, annotations
 
 def convert_file( path, out_dir ):
-    from wx_annotate_shell import Annotations
-
-    A = Annotations()
-    A.Load( path )
+    A = load_annotations( path )
 
     shapes, annotations = convert_annotations( A.anns )
 
