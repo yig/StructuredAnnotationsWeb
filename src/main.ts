@@ -14,6 +14,9 @@ const app = new App( {
     flash: $( 'flash' ),
 } );
 
+// For debugging and automated testing in development builds.
+if( import.meta.env.DEV ) ( window as unknown as { app: App } ).app = app;
+
 interface SceneEntry { name: string, file: string, shapes: number, annotations: number }
 
 async function main(): Promise<void> {
