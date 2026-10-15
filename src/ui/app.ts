@@ -19,6 +19,7 @@ import { showMenu, hideMenu } from './menu';
 const kWidgetNames = [ 'cap_radius_manip', 'cross_section_tilt', 'ellipse_rotscale', 'radius_manip', 'same_angle', 'same_length', 'symmetry_plane_manip' ];
 const kAllAnnotationTypes: Annotation['type'][] = [ 'connection', 'sameTilt', 'sameScale', 'sameLength', 'mirror', 'align' ];
 const kMaxUndo = 100;
+const kDefaultImage = new URL( 'xy-grid.png', document.baseURI ).href;
 
 interface Snapshot { scene: SceneData; selection: string[] }
 
@@ -125,12 +126,13 @@ export class App implements AppContext {
         void this.loadScene( { format: 'structured-annotations-scene', version: 1, name: 'Untitled', image: null, shapes: [], annotations: [] }, window.location.href );
     }
 
+    // Scenes without a guide image show a grid, as in the desktop app (scenes/artwork/xy grid2.png).
+    // The default isn't stored in the scene.
     private async setImageFromScene(): Promise<void> {
         this.image = null;
-        if( this.scene.image ) {
-            try { this.image = await loadImage( new URL( this.scene.image, this.baseUrl ).href ); }
-            catch( e ) { this.flash( String( ( e as Error ).message ) ); }
-        }
+        const url = this.scene.image ? new URL( this.scene.image, this.baseUrl ).href : kDefaultImage;
+        try { this.image = await loadImage( url ); }
+        catch( e ) { this.flash( String( ( e as Error ).message ) ); }
         this.view3d.setImage( this.image, ...this.imageRect() );
     }
 

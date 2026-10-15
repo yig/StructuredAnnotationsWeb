@@ -13,7 +13,8 @@ preview uses three.js. It runs entirely in the browser.
     npm test           # unit tests, and comparisons against the desktop app (see Testing)
 
 Open a scene from the *Example* menu (or with `?scene=<file>.json` in the URL), start a new one, or open
-a saved `.json` file. *Guide Image…* sets the image to trace; it is embedded in saved scenes.
+a saved `.json` file. *Guide Image…* sets the image to trace; it is embedded in saved scenes. Scenes without a guide image
+show the desktop app's default grid (`public/xy-grid.png`, from `scenes/artwork/xy grid2.png`).
 *Export OBJ* writes the 3D model, one object per primitive (and per mirrored copy).
 
 ## Tools
