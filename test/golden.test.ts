@@ -25,7 +25,7 @@ interface GoldenShape {
 interface Golden { raw: Record<string, GoldenShape>, solved: Record<string, GoldenShape>, mirrored: GoldenMesh[] }
 
 // Scenes whose JSON intentionally differs from the desktop app's data (see tools/annscene2json.py).
-const kKnownSolvedDifferences = new Set( [ '090424-the-civilian' ] );
+const kKnownSolvedDifferences = new Set<string>();
 
 // The spine depth solve (a 1e7-weighted soft constraint) is badly conditioned (condition numbers
 // up to ~1e16), so the desktop implementation and this port both deviate from the exact solution

@@ -47,8 +47,9 @@ Undo/redo with Cmd/Ctrl+Z and Shift+Cmd/Ctrl+Z.
   - `edit.ts`, `curves.ts`, `intersections.ts`: editing operations and 2D curve utilities used by the tools.
 - `src/ui/` — the views, tools, and application.
 - `tools/` — Python scripts run with the desktop app's environment:
-  - `annscene2json.py` converts desktop `.annscene` scenes to JSON (`public/scenes/` holds the 47 scenes
-    from `../scenes/collection`, excluding autosave `sessions/` folders).
+  - `annscene2json.py` converts desktop `.annscene` scenes to JSON (`public/scenes/` holds 29 scenes
+    from `../scenes/collection`; autosave `sessions/` folders and scenes with copyrighted artwork are
+    excluded).
   - `golden.py` records reference geometry from the desktop implementation for testing.
 
 The port follows the desktop code closely; comments name the Python functions each part ports.
@@ -60,8 +61,9 @@ radii, symmetry directions, cross sections, outlines, meshes) and the solved mod
 annotations, including mirrored copies) against geometry recorded from the desktop app. The reference
 data is large, so it isn't committed; generate it from the repository root with
 
-    find scenes/collection -name '*.annscene' -not -path '*/sessions/*' -print0 \
-        | xargs -0 venv/bin/python web/tools/golden.py web/test/golden
+    venv/bin/python web/tools/golden.py web/test/golden SCENE.annscene ...
+
+for the `.annscene` files the converted scenes in `public/scenes/` came from.
 
 The comparison tolerance is 1e-3 (in image-width units of 2). The 3D spine solve is badly conditioned
 (condition numbers up to ~1e16, from its 1e7-weighted soft constraints), so both implementations differ
@@ -71,8 +73,7 @@ from the exact solution by up to ~1e-4 in places, in different ways; everything 
 
 - Only the paper's features are ported. Not ported: cuboids, FiberMesh-style "rotund" shapes, the
   symmetry cross section shapes, oblique projection, and "Redraw Silhouette" (disabled in the desktop app).
-- One converted scene (`090424-the-civilian`) had a same-length annotation referring to a deleted
-  connection; it now refers to the live connection between the same shapes, so its solved model
-  differs slightly from the desktop app's (its test is skipped).
+- When a same-length annotation refers to a deleted connection, the converter makes it refer to the
+  live connection between the same shapes (the desktop app keeps using the deleted connection's curve).
 - Annotation group colors are derived from the group's position in the list rather than chosen randomly.
 - Locked shapes, as in the desktop app, are not saved with the scene.

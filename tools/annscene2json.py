@@ -3,7 +3,10 @@ Converts "wx_annotate_shell file format" .annscene pickles (the format saved by
 wx_annotate_collection.py) into the JSON scene format used by the web port.
 
 Usage (from the repository root, using the Python environment that runs the desktop app):
-    venv/bin/python web/tools/annscene2json.py OUTPUT_DIR SCENE.annscene [SCENE.annscene ...]
+    venv/bin/python web/tools/annscene2json.py [--include-excluded] OUTPUT_DIR SCENE.annscene [SCENE.annscene ...]
+
+Scenes listed in kExcludedScenes (whose artwork can't be redistributed) are skipped unless
+--include-excluded is given.
 
 Each scene is written to OUTPUT_DIR/<scene name, made URL-safe>.json.  The guide image, if found,
 is copied to OUTPUT_DIR/images/ and referenced relative to the JSON file.
@@ -20,6 +23,17 @@ import warnings
 sys.path.insert( 0, os.path.dirname( os.path.abspath( __file__ ) ) )
 from common import kRepoRoot, load_annotations
 warnings.filterwarnings( 'ignore' )
+
+## Scenes whose guide images can't be redistributed, by the URL-safe name of the scene file.
+## They are skipped (pass --include-excluded to convert them anyway).
+kExcludedScenes = {
+    '090424-the-civilian', 'body-arms-hand', 'cactuar-beams',
+    'castlevania-wii-whip2-collection', 'castlevania-wii-whip2-2',
+    'clangnuts-atkins-diet', 'clangnuts-atkins-diet-tilted',
+    'early-head-ears', 'ears-body-cross-sections', 'everything-with-face', 'everything', 'hand',
+    'hercules-phil', 'tom-jerry-tv-01', 'tom-jerry-tv-01-2', 'totoro',
+    'wallace-gromit-the-curse-of-the-were-rabbit', 'wuzzles',
+    }
 
 kFormatName = 'structured-annotations-scene'
 kFormatVersion = 1
@@ -234,9 +248,15 @@ def main():
         print( __doc__ )
         sys.exit( 1 )
 
-    out_dir = sys.argv[1]
+    args = sys.argv[1:]
+    include_excluded = '--include-excluded' in args
+    args = [ a for a in args if a != '--include-excluded' ]
+    out_dir = args[0]
     os.makedirs( out_dir, exist_ok = True )
-    for path in sys.argv[2:]:
+    for path in args[1:]:
+        if not include_excluded and slug( os.path.splitext( os.path.basename( path ) )[0] ) in kExcludedScenes:
+            print( 'Skipping excluded scene:', path )
+            continue
         convert_file( path, out_dir )
     write_index( out_dir )
 
