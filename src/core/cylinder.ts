@@ -15,6 +15,10 @@ import {
 
 export const kMinRadius = 0.01;
 export const kCrossSectionSamples = 21;
+
+// Generated geometry by cylinder parameters (least recently used first); see fillFromGeometryCache().
+const geometryCache = new Map<string, Cylinder>();
+const kGeometryCacheSize = 400;
 // Whether to use the smoothed distance field to avoid pinching (annotations_sweep.kNoPinch).
 export let kNoPinch = true;
 export function setNoPinch( noPinch: boolean ): void { kNoPinch = noPinch; }
@@ -98,8 +102,20 @@ export class Cylinder {
         };
     }
 
-    // A copy of the user-specified data, without any cached geometry.
-    clone(): Cylinder { return new Cylinder( this.id, this.toData() ); }
+    // A copy, including cached geometry (so unchanged shapes needn't be re-meshed when solving).
+    // Geometry that translate() and offsetInDepth() modify in place is deep-copied; the rest is
+    // never modified in place, so it is shared.
+    clone(): Cylinder {
+        const c = new Cylinder( this.id, this.toData() );
+        c._spine3d = this._spine3d && this._spine3d.map( p => [ p[0], p[1], p[2] ] as Vec3 );
+        c._diffuser = this._diffuser;
+        c._denseRadii = this._denseRadii;
+        c._denseCrossSections = this._denseCrossSections;
+        c._symmetryDirections = this._symmetryDirections;
+        c._mesh = this._mesh && this._mesh.clone();
+        c._boundary2d = this._boundary2d && this._boundary2d.map( p => [ p[0], p[1] ] as Vec2 );
+        return c;
+    }
 
     // Invalidates cached geometry that depends on the given kind of change.
     changed( what: CylinderChange ): void {
@@ -216,7 +232,32 @@ export class Cylinder {
         ];
     }
 
-    get mesh(): TriMesh {
+    // Meshing is expensive and the same parameters recur (e.g. every time annotations are applied),
+    // so generated geometry is cached by the cylinder's parameters.  The cached copies are pristine:
+    // generated from the parameters, before any translation.
+    private fillFromGeometryCache(): void {
+        const key = JSON.stringify( [ kNoPinch, this.spine2d, this.tilts.entries, this.radii.entries, this.symmetry.entries, this.crossSections.entries, this.capRadii ] );
+        const cached = geometryCache.get( key );
+        if( cached ) {
+            geometryCache.delete( key );
+            geometryCache.set( key, cached );
+            const copy = cached.clone();
+            this._spine3d ??= copy._spine3d;
+            this._diffuser ??= copy._diffuser;
+            this._denseRadii ??= copy._denseRadii;
+            this._denseCrossSections ??= copy._denseCrossSections;
+            this._symmetryDirections ??= copy._symmetryDirections;
+            this._mesh = copy._mesh;
+            this._boundary2d ??= copy._boundary2d;
+            return;
+        }
+        // Generate everything, then cache a copy before anything can modify it.
+        this.generate();
+        geometryCache.set( key, this.clone() );
+        if( geometryCache.size > kGeometryCacheSize ) geometryCache.delete( geometryCache.keys().next().value! );
+    }
+    
+    private generate(): void {
         if( !this._mesh ) {
             if( this.crossSections.size === 0 ) {
                 this._mesh = kNoPinch
@@ -230,7 +271,12 @@ export class Cylinder {
                 this._mesh = meshFromSweepCrossSections( this.spine3d, sections, this.caps(), kNoPinch );
             }
         }
-        return this._mesh;
+        void this.boundary2d;
+    }
+    
+    get mesh(): TriMesh {
+        if( !this._mesh ) this.fillFromGeometryCache();
+        return this._mesh!;
     }
 
     // The 2d outline: the spine offset by the radii, with end caps (gen_offset_boundary2d()).

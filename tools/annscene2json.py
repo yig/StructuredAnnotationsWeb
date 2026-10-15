@@ -5,7 +5,7 @@ wx_annotate_collection.py) into the JSON scene format used by the web port.
 Usage (from the repository root, using the Python environment that runs the desktop app):
     venv/bin/python web/tools/annscene2json.py OUTPUT_DIR SCENE.annscene [SCENE.annscene ...]
 
-Each scene is written to OUTPUT_DIR/<scene name>.json.  The guide image, if found,
+Each scene is written to OUTPUT_DIR/<scene name, made URL-safe>.json.  The guide image, if found,
 is copied to OUTPUT_DIR/images/ and referenced relative to the JSON file.
 
 The JSON format is documented in web/src/core/scene.ts.
@@ -39,6 +39,16 @@ def ordered_items( d ):
     (for example, when two values map to the same spine vertex, the later one wins).
     '''
     return list( d.items() )
+
+def slug( name ):
+    '''
+    Returns a URL-safe version of a file name (without its extension), so that converted files
+    can be served by any static web server.
+    '''
+    import re, unicodedata
+    name = unicodedata.normalize( 'NFKD', name ).encode( 'ascii', 'ignore' ).decode( 'ascii' )
+    name = re.sub( r'[^A-Za-z0-9]+', '-', name ).strip( '-' ).lower()
+    return name or 'scene'
 
 def find_image( image_path ):
     '''
@@ -198,7 +208,8 @@ def convert_file( path, out_dir ):
     image_src = find_image( stored_image_path )
     if image_src is not None:
         os.makedirs( os.path.join( out_dir, 'images' ), exist_ok = True )
-        image = 'images/' + os.path.basename( image_src )
+        base, ext = os.path.splitext( os.path.basename( image_src ) )
+        image = 'images/' + slug( base ) + ext.lower()
         shutil.copyfile( image_src, os.path.join( out_dir, image ) )
     elif stored_image_path is not None:
         print( 'WARNING: guide image not found:', stored_image_path )
@@ -212,7 +223,7 @@ def convert_file( path, out_dir ):
         'annotations': annotations,
         }
 
-    out_path = os.path.join( out_dir, name + '.json' )
+    out_path = os.path.join( out_dir, slug( name ) + '.json' )
     with open( out_path, 'w' ) as f:
         json.dump( scene, f, separators = ( ',', ':' ) )
     print( 'Wrote', out_path )

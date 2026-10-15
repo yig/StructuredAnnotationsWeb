@@ -81,7 +81,8 @@ def record( path, out_dir ):
         elif hasattr( ann, 'mesh' ) and type( ann ).__name__ == 'Struct':
             mirrored.append( mesh_json( ann.mesh ) )
 
-    name = os.path.splitext( os.path.basename( path ) )[0]
+    from annscene2json import slug
+    name = slug( os.path.splitext( os.path.basename( path ) )[0] )
     out_path = os.path.join( out_dir, name + '.golden.json' )
     with open( out_path, 'w' ) as f:
         json.dump( { 'raw': raw, 'solved': solved, 'mirrored': mirrored }, f, separators = ( ',', ':' ) )

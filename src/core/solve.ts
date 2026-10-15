@@ -32,7 +32,11 @@ class Solver {
 
     // With 'clone' false, the solver operates on the scene's own shapes; use only for queries.
     constructor( scene: Scene, clone = true ) {
-        for( const s of scene.shapes ) this.shapes.set( s.id, clone ? s.clone() : s );
+        for( const s of scene.shapes ) {
+            // Generate the user's shape's geometry first, so that it is cached for the next solve.
+            if( clone ) void s.mesh;
+            this.shapes.set( s.id, clone ? s.clone() : s );
+        }
         // Copy annotations, because connection curves are translated along with shapes.
         // (Don't remove invalid ones: same-length items refer to connections by index.)
         this.annotations = structuredClone( scene.annotations );
