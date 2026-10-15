@@ -5,6 +5,10 @@ paper *Structured Annotations for 2D-to-3D Modeling* by Yotam Gingold, Takeo Iga
 (`../paper.tex`). It is a TypeScript rewrite: the 2D annotation view is an HTML canvas and the 3D
 preview uses three.js. It runs entirely in the browser.
 
+**Try it live:** <https://yig.github.io/StructuredAnnotationsWeb/>
+
+**Paper project page:** <https://cragl.cs.gmu.edu/annotations/>
+
 ## Running
 
     npm install

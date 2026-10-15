@@ -80,7 +80,7 @@ async function main(): Promise<void> {
     $( 'help-button' ).addEventListener( 'click', () => help.showModal() );
 
     const requested = new URLSearchParams( window.location.search ).get( 'scene' );
-    const initial = entries.find( e => e.file === requested ) ?? entries.find( e => e.name === 'camel' ) ?? entries[0];
+    const initial = entries.find( e => e.file === requested ) ?? entries.find( e => e.file === 'vilppu-page-63-crop3.json' ) ?? entries[0];
     if( initial ) await load( initial.file );
     else app.newScene();
 }
