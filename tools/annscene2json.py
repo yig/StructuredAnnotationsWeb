@@ -227,5 +227,21 @@ def main():
     os.makedirs( out_dir, exist_ok = True )
     for path in sys.argv[2:]:
         convert_file( path, out_dir )
+    write_index( out_dir )
+
+def write_index( out_dir ):
+    '''
+    Writes OUTPUT_DIR/index.json, listing every scene in OUTPUT_DIR, for the web app's scene menu.
+    '''
+    scenes = []
+    for name in sorted( os.listdir( out_dir ), key = str.lower ):
+        if not name.endswith( '.json' ) or name == 'index.json': continue
+        with open( os.path.join( out_dir, name ) ) as f:
+            scene = json.load( f )
+        if scene.get( 'format' ) != kFormatName: continue
+        scenes.append( { 'name': scene['name'], 'file': name, 'shapes': len( scene['shapes'] ), 'annotations': len( scene['annotations'] ) } )
+    with open( os.path.join( out_dir, 'index.json' ), 'w' ) as f:
+        json.dump( scenes, f, indent = 1 )
+    print( 'Wrote', os.path.join( out_dir, 'index.json' ) )
 
 if __name__ == '__main__': main()

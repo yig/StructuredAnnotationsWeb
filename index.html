@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Structured Annotations</title>
+    <link rel="icon" href="favicon.png">
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+    <header class="topbar">
+        <h1 class="app-title">Structured Annotations <span class="subtitle">for 2D-to-3D Modeling</span></h1>
+        <span id="scene-title" class="scene-title"></span>
+        <div class="actions">
+            <label class="scene-picker">Example
+                <select id="scene-select"><option value="">Choose a scene…</option></select>
+            </label>
+            <button id="new">New</button>
+            <button id="open">Open…</button>
+            <button id="save">Save</button>
+            <button id="image">Guide Image…</button>
+            <button id="export">Export OBJ</button>
+            <button id="undo" disabled title="Undo (Ctrl/Cmd+Z)">Undo</button>
+            <button id="redo" disabled title="Redo (Ctrl/Cmd+Shift+Z)">Redo</button>
+            <button id="help-button" aria-haspopup="dialog">Help</button>
+        </div>
+        <input id="open-file" type="file" accept=".json,application/json" hidden>
+        <input id="image-file" type="file" accept="image/*" hidden>
+    </header>
+    <main class="workspace">
+        <nav id="toolbar" class="toolbar" aria-label="Tools"></nav>
+        <section class="pane pane-2d">
+            <canvas id="view2d" aria-label="Annotation view: draw primitives and annotations over the guide image"></canvas>
+            <div id="status" class="status" aria-live="polite"></div>
+            <div class="view-options">
+                <label><input id="show-all" type="checkbox" checked> All annotations</label>
+                <label><input id="fill" type="checkbox"> Fill shapes</label>
+            </div>
+        </section>
+        <section class="pane pane-3d">
+            <canvas id="view3d" aria-label="3D result: drag to rotate, scroll to zoom"></canvas>
+            <div class="view-options">
+                <label><input id="show-image-3d" type="checkbox" checked> Guide image</label>
+                <button id="reset-3d">Front view</button>
+            </div>
+        </section>
+    </main>
+    <div id="flash" class="flash" role="alert" hidden></div>
+    <dialog id="help" class="help-dialog">
+        <form method="dialog">
+            <h2>Structured Annotations for 2D-to-3D Modeling</h2>
+            <p>A browser port of the system from the SIGGRAPH Asia 2009 paper by Yotam Gingold, Takeo Igarashi, and Denis Zorin.
+            Place primitives over a guide image and annotate them; the 3D model on the right is built from your input.</p>
+            <h3>Primitives</h3>
+            <ul>
+                <li><b>Cylinder</b> (C): draw a spine (hold Shift for a straight one). Select it to show its handles:
+                    tilt handles lift the shape out of the image plane; scale handles stretch the outline (Alt: scale symmetrically);
+                    the end handles set the end-cap size; the symmetry handle orients the symmetry sheet.
+                    Drag the spine to deform it (Alt-drag adds a tilt handle). Click a cross section to edit its shape.
+                    Right-click a selected shape for more operations.</li>
+                <li><b>Ellipsoid</b> (E): draw its outline. Its handles rotate and scale it, change its radius, and tilt its circular cross section.</li>
+            </ul>
+            <h3>Annotations</h3>
+            <ul>
+                <li><b>Connect</b> (K): drag where two overlapping shapes should meet; this places them in depth. Right-click a connection for front/back attachment.</li>
+                <li><b>Same tilt</b> (T), <b>same length</b> (L), <b>same scale</b> (R): click a cross section, spine, or diameter to start or choose a group, then click others to add them. Delete removes the item under the mouse.</li>
+                <li><b>Mirror</b> (M): click a shape, then the connected shape to mirror it across.</li>
+                <li><b>Align</b> (A): click two shapes connected to a common third shape. <b>Center</b> (X): click a shape, then the connected shape to center it on.</li>
+            </ul>
+            <h3>View</h3>
+            <p>Scroll to zoom, drag with the middle button or hold Space to pan. In the 3D view, drag to rotate and scroll to zoom.
+            Select (V), Pan (H), Zoom (Z). Undo: Ctrl/Cmd+Z.</p>
+            <div class="buttons"><button value="close" class="primary">Close</button></div>
+        </form>
+    </dialog>
+    <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

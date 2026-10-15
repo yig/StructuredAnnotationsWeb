@@ -1,0 +1,176 @@
+[
+ {
+  "name": "achewood-2009-01-12 6mins",
+  "file": "achewood-2009-01-12 6mins.json",
+  "shapes": 6,
+  "annotations": 11
+ },
+ {
+  "name": "achewood-2009-01-12 alt 8mins",
+  "file": "achewood-2009-01-12 alt 8mins.json",
+  "shapes": 6,
+  "annotations": 12
+ },
+ {
+  "name": "bae_man-bae-yotam",
+  "file": "bae_man-bae-yotam.json",
+  "shapes": 8,
+  "annotations": 23
+ },
+ {
+  "name": "Bath Time, Kei Acedera (2D)",
+  "file": "Bath Time, Kei Acedera (2D).json",
+  "shapes": 12,
+  "annotations": 22
+ },
+ {
+  "name": "blair 37 sculpting",
+  "file": "blair 37 sculpting.json",
+  "shapes": 10,
+  "annotations": 17
+ },
+ {
+  "name": "brontosaurus",
+  "file": "brontosaurus.json",
+  "shapes": 3,
+  "annotations": 5
+ },
+ {
+  "name": "camel-demo",
+  "file": "camel-demo.json",
+  "shapes": 8,
+  "annotations": 16
+ },
+ {
+  "name": "camel",
+  "file": "camel.json",
+  "shapes": 7,
+  "annotations": 16
+ },
+ {
+  "name": "canreader_071",
+  "file": "canreader_071.json",
+  "shapes": 7,
+  "annotations": 11
+ },
+ {
+  "name": "crow bakery - giraffe - collection",
+  "file": "crow bakery - giraffe - collection.json",
+  "shapes": 9,
+  "annotations": 20
+ },
+ {
+  "name": "crow bakery - giraffe - new",
+  "file": "crow bakery - giraffe - new.json",
+  "shapes": 8,
+  "annotations": 13
+ },
+ {
+  "name": "crow bakery - panda",
+  "file": "crow bakery - panda.json",
+  "shapes": 6,
+  "annotations": 9
+ },
+ {
+  "name": "crow bakery - rabbit - collection",
+  "file": "crow bakery - rabbit - collection.json",
+  "shapes": 7,
+  "annotations": 11
+ },
+ {
+  "name": "dog",
+  "file": "dog.json",
+  "shapes": 6,
+  "annotations": 10
+ },
+ {
+  "name": "ellipsoid",
+  "file": "ellipsoid.json",
+  "shapes": 1,
+  "annotations": 0
+ },
+ {
+  "name": "fibermesh-totoro 8min",
+  "file": "fibermesh-totoro 8min.json",
+  "shapes": 5,
+  "annotations": 10
+ },
+ {
+  "name": "generalized cylinder",
+  "file": "generalized cylinder.json",
+  "shapes": 1,
+  "annotations": 0
+ },
+ {
+  "name": "hotdog",
+  "file": "hotdog.json",
+  "shapes": 5,
+  "annotations": 12
+ },
+ {
+  "name": "hotdog2",
+  "file": "hotdog2.json",
+  "shapes": 5,
+  "annotations": 15
+ },
+ {
+  "name": "hurri_july08_09 video",
+  "file": "hurri_july08_09 video.json",
+  "shapes": 12,
+  "annotations": 20
+ },
+ {
+  "name": "hurri_july08_09",
+  "file": "hurri_july08_09.json",
+  "shapes": 12,
+  "annotations": 20
+ },
+ {
+  "name": "kat_girl2",
+  "file": "kat_girl2.json",
+  "shapes": 20,
+  "annotations": 32
+ },
+ {
+  "name": "kat_girl2_1",
+  "file": "kat_girl2_1.json",
+  "shapes": 20,
+  "annotations": 33
+ },
+ {
+  "name": "man-on-arrow-1.1",
+  "file": "man-on-arrow-1.1.json",
+  "shapes": 11,
+  "annotations": 22
+ },
+ {
+  "name": "man-on-arrow",
+  "file": "man-on-arrow.json",
+  "shapes": 11,
+  "annotations": 22
+ },
+ {
+  "name": "man-with-snake",
+  "file": "man-with-snake.json",
+  "shapes": 14,
+  "annotations": 32
+ },
+ {
+  "name": "saluki",
+  "file": "saluki.json",
+  "shapes": 8,
+  "annotations": 12
+ },
+ {
+  "name": "vilppu page 63 crop2",
+  "file": "vilppu page 63 crop2.json",
+  "shapes": 6,
+  "annotations": 10
+ },
+ {
+  "name": "vilppu page 63 crop3",
+  "file": "vilppu page 63 crop3.json",
+  "shapes": 9,
+  "annotations": 20
+ }
+]
